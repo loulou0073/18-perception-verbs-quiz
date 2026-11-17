@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 8 지각동사 퀴즈 (개인전)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f4ef; --card:#ffffff; --ink:#1f2430; --muted:#6b7180; --line:#e4e0d6;
+    --accent:#2f5bd3; --accent-soft:#e8eefc; --ok:#1f8a4c; --ok-soft:#e3f4ea;
+    --bad:#c8402f; --bad-soft:#fbe7e3; --hl:#fff1b8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:24px 20px 48px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand .eyebrow{font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
+  .brand h1{margin:2px 0 0;font-size:26px;font-weight:900}
+  .teams{display:flex;gap:10px}
+  .team{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 10px;display:flex;align-items:center;gap:8px}
+  .team .name{font-weight:700;font-size:14px}
+  .team .pts{font-size:22px;font-weight:900;min-width:28px;text-align:center;font-variant-numeric:tabular-nums}
+  .team button{border:1px solid var(--line);background:#faf9f6;border-radius:8px;width:28px;height:28px;font-size:16px;cursor:pointer;color:var(--ink)}
+  .team button:hover{background:var(--accent-soft)}
+  .progress{margin:20px 0 8px;display:flex;gap:4px}
+  .dot{flex:1;height:8px;border-radius:4px;background:var(--line);cursor:pointer;border:0;padding:0}
+  .dot.done-ok{background:var(--ok)} .dot.done-bad{background:var(--bad)} .dot.cur{outline:2px solid var(--ink);outline-offset:1px}
+  .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;font-weight:500}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px;margin-top:14px;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .round{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:14px;padding:4px 12px;border-radius:999px}
+  .q{font-size:26px;font-weight:700;line-height:1.5;margin:16px 0 6px}
+  .sub{font-size:17px;color:var(--muted);margin:0 0 18px}
+  .sent{font-family:Georgia,"Times New Roman",serif;font-size:30px;line-height:1.5;background:#faf9f6;border:1px dashed var(--line);border-radius:14px;padding:18px 22px;margin:8px 0 22px}
+  .blank{display:inline-block;min-width:110px;border-bottom:3px solid var(--ink);text-align:center}
+  .choices{display:grid;gap:12px}
+  .choices.two{grid-template-columns:1fr 1fr}
+  .choice{display:flex;align-items:center;gap:14px;text-align:left;width:100%;font:inherit;font-size:21px;padding:16px 18px;border:2px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;color:var(--ink);transition:border-color .15s,background .15s}
+  .choice:hover:not(:disabled){border-color:var(--accent)}
+  .choice .key{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-weight:900;font-size:16px}
+  .choice.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .choice.ok{border-color:var(--ok);background:var(--ok-soft)}
+  .choice.bad{border-color:var(--bad);background:var(--bad-soft)}
+  .choice:disabled{cursor:default}
+  .choice.ox{justify-content:center;font-size:56px;font-weight:900;padding:22px}
+  .en{font-family:Georgia,"Times New Roman",serif}
+  .tokens{display:flex;flex-wrap:wrap;gap:10px;font-family:Georgia,"Times New Roman",serif;font-size:30px;line-height:1.4;background:#faf9f6;border:1px dashed var(--line);border-radius:14px;padding:18px 22px;margin:8px 0 6px}
+  .tok{font:inherit;border:2px solid transparent;border-radius:10px;background:transparent;padding:2px 8px;cursor:pointer;color:var(--ink)}
+  .tok:hover:not(:disabled){background:var(--hl)}
+  .tok.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .tok.ok{border-color:var(--ok);background:var(--ok-soft)}
+  .tok.bad{border-color:var(--bad);background:var(--bad-soft);text-decoration:line-through}
+  .tok:disabled{cursor:default}
+  .answerline{min-height:66px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:Georgia,"Times New Roman",serif;font-size:28px;border-bottom:3px solid var(--ink);padding:8px 4px;margin:10px 0 18px}
+  .answerline .ph{font-family:"Noto Sans KR",sans-serif;font-size:16px;color:var(--muted)}
+  .bank{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{font-family:Georgia,"Times New Roman",serif;font-size:24px;padding:10px 16px;border:2px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;color:var(--ink)}
+  .chip:hover:not(:disabled){border-color:var(--accent)}
+  .chip.used{opacity:.25}
+  .chip.inline{font-size:26px;padding:4px 12px;background:var(--accent-soft);border-color:var(--accent)}
+  .actions{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:12px;flex-wrap:wrap}
+  .btn{font:inherit;font-weight:700;font-size:18px;padding:13px 26px;border-radius:12px;border:2px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer}
+  .btn.ghost{background:#fff;color:var(--ink)}
+  .btn:disabled{opacity:.35;cursor:default}
+  .feedback{margin-top:22px;border-radius:14px;padding:18px 22px;display:none}
+  .feedback.show{display:block}
+  .feedback.ok{background:var(--ok-soft);border:1px solid #bfe3cc}
+  .feedback.bad{background:var(--bad-soft);border:1px solid #f1c6bd}
+  .feedback .verdict{font-weight:900;font-size:20px;margin-bottom:6px}
+  .feedback.ok .verdict{color:var(--ok)} .feedback.bad .verdict{color:var(--bad)}
+  .feedback .ans{font-size:18px;margin-bottom:6px}
+  .feedback .exp{font-size:17px;line-height:1.7;color:#333}
+  .hint{font-size:14px;color:var(--muted)}
+  .rounds{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+  .rbtn{font:inherit;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
+  .rbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .picks{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;padding:6px 0}
+  .picks.list{flex-direction:column;align-items:stretch;gap:10px}
+  .pk{font-family:Georgia,"Times New Roman",serif;font-size:28px;padding:12px 26px;border:3px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;color:var(--ink);transition:border-color .15s,background .15s}
+  .picks.list .pk{font-size:22px;border-radius:14px;text-align:left;padding:14px 20px}
+  .pk:hover:not(:disabled){border-color:var(--accent)}
+  .pk.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .pk.ok{border-color:var(--ok);background:var(--ok-soft)}
+  .pk.bad{border-color:var(--bad);background:var(--bad-soft);text-decoration:line-through}
+  .pk.miss{border-color:var(--ok);border-style:dashed}
+  .pk:disabled{cursor:default}
+  .player{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 14px}
+  .pname{font-weight:700;font-size:15px}
+  .pscore{font-weight:900;font-size:20px;color:var(--ok);font-variant-numeric:tabular-nums}
+  .pscore small{font-size:14px;color:var(--muted);font-weight:500}
+  .start{padding:6px 0}
+  .start form{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 8px}
+  .nm{flex:1;min-width:220px;font:inherit;font-size:20px;padding:13px 16px;border:2px solid var(--line);border-radius:12px;outline:none}
+  .nm:focus{border-color:var(--accent)}
+  .rules{margin:18px 0 0;padding-left:20px;color:#444;font-size:16px;line-height:1.9}
+  .certificate{border:2px solid var(--accent);border-radius:18px;padding:22px;background:linear-gradient(180deg,#f3f6ff,#fff)}
+  .certificate .who{font-size:22px;font-weight:900}
+  .certificate .big small{font-size:28px;margin-left:4px}
+  .certificate .sub2{font-size:16px;color:#444}
+  .certificate .msg{margin-top:10px;font-size:18px;font-weight:700;color:var(--accent)}
+  .wrong{margin-top:20px}
+  .wlist{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+  .wq{font:inherit;font-weight:700;padding:6px 14px;border-radius:999px;border:1px solid #f1c6bd;background:var(--bad-soft);color:var(--bad);cursor:pointer}
+  span.dot{display:block;cursor:default}
+  .end{text-align:center;padding:20px 0}
+  .end .big{font-size:72px;font-weight:900;margin:10px 0}
+  .end table{margin:20px auto 0;border-collapse:collapse;font-size:16px;text-align:left}
+  .end td,.end th{padding:8px 14px;border-bottom:1px solid var(--line)}
+  .end th{color:var(--muted);font-weight:500}
+  .summary{background:#faf9f6;border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:24px;text-align:left;font-size:16px;line-height:1.8}
+  .summary b{color:var(--accent)}
+  @media (max-width:640px){
+    .card{padding:22px} .q{font-size:21px} .sent,.tokens{font-size:23px} .choice{font-size:18px}
+    .choices.two{grid-template-columns:1fr} .choice.ox{font-size:44px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="eyebrow">Grammar · Lesson 8</div>
+      <h1>지각동사 + 목적어 + 목적격 보어 퀴즈</h1>
+    </div>
+    <div class="player" id="player"></div>
+  </header>
+
+  <div class="progress" id="progress"></div>
+  <div class="meta"><span id="roundName"></span><span id="counter"></span></div>
+
+  <div class="card" id="card"></div>
+</div>
+
+<script>
+const ROUNDS = {
+  1:"Round 1 · 개념 O/X",
+  2:"Round 2 · 지각동사 동그라미",
+  3:"Round 3 · 빈칸 채우기",
+  4:"Round 4 · 동사원형 vs 동사ing",
+  5:"Round 5 · 5형식 비교",
+  6:"Round 6 · 틀린 곳 찾기",
+  7:"Round 7 · 문장 배열"
+};
+
+const ALL_QUESTIONS = [
+  // Round 1: O/X (2)
+  {r:1,type:"ox",q:"지각동사가 쓰인 문장은 항상 5형식이다.",a:"X",
+   exp:"지각동사 뒤에 <b>목적어 + 목적격 보어</b>가 올 때만 5형식이에요.<br>I saw <u>a movie</u>. → 3형식 / This soup smells <u>good</u>. → 2형식 / I saw <u>him</u> <u>leave</u>. → 5형식"},
+  {r:1,type:"ox",q:"지각동사 문장을 수동태로 바꿔도 목적격 보어 자리에 to부정사는 쓸 수 없다.",a:"X",
+   exp:"능동태에서는 to를 쓰지 않지만, <b>수동태</b>에서는 to부정사가 다시 살아나요.<br>They saw him enter the building. → He was seen <b>to enter</b> the building."},
+
+  // Round 2: circle perception verbs (3)
+  {r:2,type:"pick",layout:"chips",q:"<b>지각동사</b>를 모두 골라 동그라미 하세요.",
+   items:["see","want","hear","make","feel","tell","smell","keep"],a:[0,2,4,6],
+   exp:"지각동사는 감각으로 인지하는 동사예요. see(보다), hear(듣다), feel(느끼다), smell(냄새 맡다)가 지각동사이고, want·tell(to부정사), make(동사원형), keep(형용사·ing)은 다른 5형식 동사예요."},
+  {r:2,type:"pick",layout:"chips",q:"<b>지각동사</b>를 모두 골라 동그라미 하세요.",
+   items:["watch","touch","listen to","let","look at","ask","help","find"],a:[0,2,4],
+   exp:"watch(지켜보다), listen to(귀 기울이다), look at(바라보다)가 지각동사예요. <b>touch</b>는 ‘만지다’라는 행동이지 감각으로 인지하는 동사가 아니에요. (I felt someone <u>touch</u> my arm.에서 지각동사는 felt!)"},
+  {r:2,type:"pick",layout:"list",q:"<b>지각동사</b>가 쓰인 문장을 모두 고르세요.",
+   items:["I watched the kids swim in the river.","Mom made me clean my room.","She listened to the birds sing.","I want you to come to my party.","We felt the house shake.","He touched the dog gently."],a:[0,2,4],
+   exp:"watched, listened to, felt가 지각동사예요. made(사역동사), want(to부정사를 쓰는 동사), touched(일반 동사)는 지각동사가 아니에요."},
+
+  // Round 3: blanks (5)
+  {r:3,type:"mc",q:"빈칸에 알맞은 것을 고르세요.",sent:"I heard the baby ____ all night.",choices:["cries","to cry","crying","cried"],a:2,en:true,
+   exp:"지각동사 heard의 목적격 보어 → 동사원형(cry) 또는 동사ing(crying). 밤새 울고 있는 진행 중인 장면이므로 crying이 자연스러워요. cries, cried처럼 시제가 붙은 형태나 to cry는 쓸 수 없어요."},
+  {r:3,type:"mc",q:"빈칸에 알맞은 것을 고르세요.",sent:"We watched the sun ____ over the sea.",choices:["rise","rises","to rise","rose"],a:0,en:true,
+   exp:"watched + the sun + <b>rise</b>(동사원형). 목적격 보어에는 -s나 과거형을 붙이지 않아요."},
+  {r:3,type:"mc",q:"빈칸에 알맞은 것을 고르세요.",sent:"Did you see ____ leave the room?",choices:["she","her","hers","she's"],a:1,en:true,
+   exp:"see 다음은 <b>목적어</b> 자리이므로 목적격 her를 씁니다."},
+  {r:3,type:"mc",q:"빈칸에 가장 자연스러운 것을 고르세요.",sent:"I smelled something ____ in the kitchen.",choices:["burns","to burn","burning","is burning"],a:2,en:true,
+   exp:"smell은 냄새가 ‘나고 있는’ 상태를 맡는 것이라 목적격 보어로 주로 <b>동사ing</b>를 써요. → I smelled something <b>burning</b>."},
+  {r:3,type:"mc",q:"빈칸에 알맞은 것을 고르세요.",sent:"He was seen ____ the building.",choices:["enter","to enter","entered","enters"],a:1,en:true,
+   exp:"지각동사의 <b>수동태</b>(was seen)에서는 동사원형이 <b>to부정사</b>로 바뀌어요. → He was seen <b>to enter</b> the building."},
+
+  // Round 4: meaning (3)
+  {r:4,type:"mc",q:"다음 문장의 의미로 가장 알맞은 것은?",sent:"I saw her cross the road.",
+   choices:["그녀가 길을 다 건너는 것을 보았다.","그녀가 길을 건너고 있는 모습을 보았다. (다 건넜는지는 모름)","그녀에게 길을 건너라고 시켰다.","그녀가 나를 보고 길을 건넜다."],a:0,
+   exp:"<b>동사원형(cross)</b>은 행동을 하나의 <b>완결된 사건</b>으로 본 것이에요. 진행 중인 모습을 봤다면 crossing을 써요."},
+  {r:4,type:"mc",q:"‘그가 피아노를 치고 있는 모습(진행 중)을 들었다’는 의미에 더 가까운 문장은?",
+   choices:["I heard him play the piano.","I heard him playing the piano."],a:1,en:true,two:true,
+   exp:"지각한 순간 행동이 <b>진행 중</b>이었다면 <b>동사ing(playing)</b>를 씁니다."},
+  {r:4,type:"mc",q:"‘누군가 문을 <b>계속 똑똑똑</b> 두드리는 소리를 들었다’에 알맞은 문장은?",
+   choices:["I heard someone knock on the door.","I heard someone knocking on the door."],a:1,en:true,two:true,
+   exp:"knock처럼 순간에 끝나는 동작에 <b>동사ing</b>를 쓰면 <b>‘반복’</b>의 느낌이 나요. knock은 한 번 똑, knocking은 똑똑똑 계속!"},
+
+  // Round 5: 5형식 비교 (7)
+  {r:5,type:"mc",q:"빈칸에 <span class='en'>open</span>이 들어갈 수 <u>없는</u> 문장은?",
+   choices:["I saw him ____ the door.","Mom let me ____ the box.","She asked me ____ the window.","We heard someone ____ the gate."],a:2,en:true,
+   exp:"ask는 목적격 보어로 <b>to부정사</b>를 써요. → She asked me <b>to open</b> the window. see, hear(지각동사)와 let(사역동사)은 동사원형을 써요."},
+  {r:5,type:"mc",q:"빈칸에 <span class='en'>play</span>가 들어갈 수 <u>없는</u> 문장은?",
+   choices:["I watched the kids ____ soccer.","Dad made me ____ the piano.","I want you ____ with me.","She heard her brother ____ the guitar."],a:2,en:true,
+   exp:"want는 목적격 보어로 <b>to부정사</b>를 써요. → I want you <b>to play</b> with me."},
+  {r:5,type:"mc",q:"빈칸에 <span class='en'>to go</span>가 들어갈 수 <u>있는</u> 문장은?",
+   choices:["I saw him ____ out.","Mom told me ____ to bed.","We heard them ____ upstairs.","Let me ____ home."],a:1,en:true,
+   exp:"tell은 목적격 보어로 <b>to부정사</b>를 써요. → Mom told me <b>to go</b> to bed. see, hear, let은 동사원형(go)을 써요."},
+  {r:5,type:"mc",q:"빈칸에 <span class='en'>sing</span>을 알맞은 형태로 넣을 때, 형태가 나머지와 <u>다른</u> 하나는?",
+   choices:["I heard her ____ a song.","We watched him ____ on stage.","I asked her ____ a song.","Mom let me ____ in my room."],a:2,en:true,
+   exp:"ask는 to부정사를 써서 I asked her <b>to sing</b> a song. 나머지는 지각동사(hear, watch)와 사역동사(let)라서 동사원형 <b>sing</b>을 써요."},
+  {r:5,type:"mc",q:"빈칸에 들어갈 말로 알맞지 <u>않은</u> 것은?",sent:"I ____ him clean the room.",
+   choices:["saw","made","let","wanted"],a:3,en:true,
+   exp:"목적격 보어가 동사원형(clean)이므로 지각동사(saw)나 사역동사(made, let)가 와야 해요. <b>want</b>는 to부정사를 쓰므로 I wanted him <b>to clean</b> the room.이 돼요."},
+  {r:5,type:"mc",q:"빈칸에 들어갈 말로 알맞은 것은?",sent:"I ____ my sister to help me.",
+   choices:["saw","heard","asked","let"],a:2,en:true,
+   exp:"목적격 보어가 <b>to부정사</b>(to help)이므로 ask, want, tell 같은 동사가 와야 해요. saw, heard, let은 동사원형을 써요."},
+  {r:5,type:"mc",q:"다음 중 <b>5형식</b> 문장은?",
+   choices:["I heard a strange noise.","I heard him sing a song.","I can hear well.","This music sounds great."],a:1,en:true,
+   exp:"heard + him(목적어) + sing(목적격 보어) → <b>5형식</b>. I heard a strange noise.는 목적어만 있는 3형식, I can hear well.은 1형식, sounds great는 감각동사 + 형용사의 2형식이에요."},
+  {r:5,type:"mc",q:"두 문장의 형식을 바르게 짝지은 것은?",sent:"(A) This soup smells good.<br>(B) I smelled something burning.",
+   choices:["(A) 2형식 – (B) 5형식","(A) 3형식 – (B) 5형식","(A) 2형식 – (B) 3형식","(A) 5형식 – (B) 5형식"],a:0,
+   exp:"(A) smell + 형용사(good) → 감각동사 <b>2형식</b>. (B) smell + 목적어(something) + 목적격 보어(burning) → <b>5형식</b>. 같은 smell이라도 뒤에 무엇이 오느냐에 따라 형식이 달라져요."},
+  {r:5,type:"mc",q:"다음 문장과 <b>문장 구조(형식)</b>가 같은 것은?",sent:"I heard him sing a song.",
+   choices:["I sang a song.","He gave me a song.","They made me laugh.","She is a good singer."],a:2,en:true,
+   exp:"I heard him sing a song.은 ‘주어+동사+목적어+목적격 보어’의 5형식. They made me laugh.도 make + 목적어(me) + 목적격 보어(laugh)의 5형식이에요."},
+
+  // Round 6: find the error (7)
+  {r:6,type:"err",q:"틀린 부분을 찾아 눌러 보세요.",tokens:["I","watched","my","sister","draws","a","picture."],a:4,fix:"draw / drawing",
+   exp:"지각동사의 목적격 보어에는 -s를 붙이지 않아요. → I watched my sister <b>draw / drawing</b> a picture."},
+  {r:6,type:"err",q:"틀린 부분을 찾아 눌러 보세요.",tokens:["We","heard","they","talking","in","the","hall."],a:2,fix:"them",
+   exp:"heard 다음은 목적어 자리이므로 목적격 <b>them</b>을 써야 해요."},
+  {r:6,type:"err",q:"틀린 부분을 찾아 눌러 보세요.",tokens:["She","felt","the","wind","to blow","on","her","face."],a:4,fix:"blow / blowing",
+   exp:"능동태 지각동사의 목적격 보어로 to부정사는 쓸 수 없어요. → She felt the wind <b>blow / blowing</b> on her face."},
+  {r:6,type:"err",q:"틀린 부분을 찾아 눌러 보세요.",tokens:["I","heard","someone","to call","my","name."],a:3,fix:"call / calling",
+   exp:"heard + someone + <b>call / calling</b>. 지각동사 다음에 to부정사 ✗!"},
+  {r:6,type:"err",q:"틀린 부분을 찾아 눌러 보세요.",tokens:["We","watched","the","children","played","in","the","park."],a:4,fix:"play / playing",
+   exp:"문장 전체가 과거라도 목적격 보어는 과거형으로 바꾸지 않아요. → We watched the children <b>play / playing</b> in the park."},
+  {r:6,type:"err",q:"틀린 부분을 찾아 눌러 보세요.",tokens:["I","smelled","something","burns","in","the","kitchen."],a:3,fix:"burning",
+   exp:"-s가 붙은 형태는 쓸 수 없고, smell은 주로 동사ing와 써요. → I smelled something <b>burning</b> in the kitchen."},
+  {r:6,type:"err",q:"틀린 부분을 찾아 눌러 보세요.",tokens:["She","was seen","leave","the","house."],a:2,fix:"to leave / leaving",
+   exp:"지각동사의 <b>수동태</b>에서는 동사원형 대신 <b>to부정사</b>를 써요. → She was seen <b>to leave</b> the house. (동사ing는 그대로 leaving도 가능)"},
+
+  // Round 7: ordering (7)
+  {r:7,type:"order",q:"우리말과 같은 뜻이 되도록 단어를 순서대로 눌러 보세요.",sub:"나는 그가 공원에서 달리고 있는 것을 보았다.",
+   bank:["running","him","saw","in the park","I"],a:["I","saw","him","running","in the park"],
+   exp:"I + saw(지각동사) + him(목적어) + running(목적격 보어) + in the park."},
+  {r:7,type:"order",q:"우리말과 같은 뜻이 되도록 단어를 순서대로 눌러 보세요.",sub:"우리는 땅이 흔들리는 것을 느꼈다.",
+   bank:["the ground","felt","shake","We"],a:["We","felt","the ground","shake"],
+   exp:"We + felt(지각동사) + the ground(목적어) + shake(목적격 보어)."},
+  {r:7,type:"order",q:"우리말과 같은 뜻이 되도록 단어를 순서대로 눌러 보세요.",sub:"나는 누군가 내 이름을 부르고 있는 것을 들었다.",
+   bank:["my name","heard","calling","someone","I"],a:["I","heard","someone","calling","my name"],
+   exp:"I + heard + someone(목적어) + calling(목적격 보어) + my name."},
+  {r:7,type:"order",q:"우리말과 같은 뜻이 되도록 단어를 순서대로 눌러 보세요.",sub:"그녀는 아이들이 운동장에서 노는 것을 지켜보았다.",
+   bank:["play","the children","She","in the playground","watched"],a:["She","watched","the children","play","in the playground"],
+   exp:"She + watched + the children(목적어) + play(목적격 보어) + in the playground."},
+  {r:7,type:"order",q:"우리말과 같은 뜻이 되도록 단어를 순서대로 눌러 보세요.",sub:"우리는 무언가 타고 있는 냄새를 맡았다.",
+   bank:["burning","smelled","We","something"],a:["We","smelled","something","burning"],
+   exp:"We + smelled + something(목적어) + burning(목적격 보어). smell은 주로 동사ing!"},
+  {r:7,type:"order",q:"우리말과 같은 뜻이 되도록 단어를 순서대로 눌러 보세요.",sub:"나는 그 남자가 버스에서 내리는 것을 보았다. <b>(필요 없는 단어 1개 포함)</b>",
+   bank:["the man","saw","get off","to get off","I","the bus"],a:["I","saw","the man","get off","the bus"],
+   exp:"I + saw + the man + get off + the bus. 능동태 지각동사 다음에는 to부정사를 쓰지 않으므로 <b>to get off</b>는 필요 없어요."},
+  {r:7,type:"order",q:"우리말과 같은 뜻이 되도록 단어를 순서대로 눌러 보세요.",sub:"그가 건물에 들어가는 것이 목격되었다. <b>(필요 없는 단어 1개 포함)</b>",
+   bank:["to enter","the building","enter","He","was seen"],a:["He","was seen","to enter","the building"],
+   exp:"수동태(was seen)에서는 to부정사가 살아나요. → He was seen <b>to enter</b> the building. 그래서 <b>enter</b>가 필요 없어요."}
+];
+
+// 개인전 15문항: O/X 1 · 동그라미 2 · 빈칸 3 · 의미 2 · 5형식 비교 3 · 틀린 곳 2 · 배열 2
+const QUESTIONS = [0,2,4,5,7,9,10,12,13,17,20,23,26,31,34].map(i=>ALL_QUESTIONS[i]);
+const LETTERS = ["a","b","c","d","e"];
+let idx = 0;
+const blank = ()=>({sel:null, order:[], picks:[], checked:false, correct:null});
+let state = QUESTIONS.map(blank);
+let player = "", attempt = 0, startTime = null, endTime = null;
+
+const $ = s => document.querySelector(s);
+
+function esc(t){ return t.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function renderPlayer(){
+  if(!player){ $("#player").innerHTML=""; return; }
+  const ok=state.filter(x=>x.correct).length, done=state.filter(x=>x.checked).length;
+  $("#player").innerHTML = `<span class="pname">👤 ${esc(player)}</span><span class="pscore">✔ ${ok} <small>/ ${done}</small></span>`;
+}
+function renderProgress(){
+  renderPlayer();
+  if(!player){ $("#progress").innerHTML=""; return; }
+  $("#progress").innerHTML = QUESTIONS.map((_,i)=>{
+    const s=state[i]; let c="dot";
+    if(s.checked) c+= s.correct?" done-ok":" done-bad";
+    if(i===idx) c+=" cur";
+    return `<span class="${c}"></span>`;
+  }).join("");
+}
+
+function sentHTML(s){ return s.replace(/____/g,'<span class="blank">&nbsp;</span>'); }
+
+function render(){
+  renderProgress();
+  if(!player){ renderStart(); return; }
+  if(idx>=QUESTIONS.length){ renderEnd(); return; }
+  const Q=QUESTIONS[idx], S=state[idx];
+  $("#roundName").textContent = ROUNDS[Q.r];
+  $("#counter").textContent = `${idx+1} / ${QUESTIONS.length}`;
+  let body = `<span class="round">Q${idx+1}</span><div class="q">${Q.q}</div>`;
+  if(Q.sub) body += `<p class="sub">${Q.sub}</p>`;
+  if(Q.sent) body += `<div class="sent">${sentHTML(Q.sent)}</div>`;
+
+  if(Q.type==="ox"){
+    body += `<div class="choices two">` + ["O","X"].map(v=>{
+      let c="choice ox";
+      if(S.checked){ if(v===Q.a) c+=" ok"; else if(v===S.sel) c+=" bad"; }
+      else if(S.sel===v) c+=" sel";
+      return `<button class="${c}" data-v="${v}" ${S.checked?"disabled":""}>${v}</button>`;
+    }).join("") + `</div>`;
+  }
+  if(Q.type==="mc"){
+    body += `<div class="choices ${Q.two?'two':''}">` + Q.choices.map((ch,i)=>{
+      let c="choice";
+      if(S.checked){ if(i===Q.a) c+=" ok"; else if(i===S.sel) c+=" bad"; }
+      else if(S.sel===i) c+=" sel";
+      return `<button class="${c}" data-v="${i}" ${S.checked?"disabled":""}><span class="key">${LETTERS[i]}</span><span class="${Q.en?'en':''}">${sentHTML(ch)}</span></button>`;
+    }).join("") + `</div>`;
+  }
+  if(Q.type==="pick"){
+    body += `<div class="picks ${Q.layout==='list'?'list':''}">` + Q.items.map((t,i)=>{
+      let c="pk"; const on=S.picks.includes(i), want=Q.a.includes(i);
+      if(S.checked){ if(on&&want) c+=" ok"; else if(on) c+=" bad"; else if(want) c+=" miss"; }
+      else if(on) c+=" sel";
+      return `<button class="${c}" data-p="${i}" ${S.checked?"disabled":""}>${Q.layout==="list"?"①②③④⑤⑥⑦⑧"[i]+" ":""}${t}</button>`;
+    }).join("") + `</div><div class="hint" style="text-align:center">해당하는 것을 모두 눌러 표시하세요. (다시 누르면 취소)</div>`;
+  }
+  if(Q.type==="err"){
+    body += `<div class="tokens">` + Q.tokens.map((t,i)=>{
+      let c="tok";
+      if(S.checked){ if(i===Q.a) c+=" bad"; if(i===S.sel && i!==Q.a) c+=" sel"; }
+      else if(S.sel===i) c+=" sel";
+      return `<button class="${c}" data-v="${i}" ${S.checked?"disabled":""}>${t}</button>`;
+    }).join("") + `</div><div class="hint">단어를 눌러 선택하세요.</div>`;
+  }
+  if(Q.type==="order"){
+    const line = S.order.length
+      ? S.order.map((bi,k)=>`<button class="chip inline" data-k="${k}" ${S.checked?"disabled":""}>${Q.bank[bi]}</button>`).join("")
+      : `<span class="ph">아래 단어를 순서대로 누르세요. (올린 단어를 누르면 다시 내려갑니다)</span>`;
+    body += `<div class="answerline">${line}</div><div class="bank">` + Q.bank.map((w,i)=>
+      `<button class="chip ${S.order.includes(i)?'used':''}" data-b="${i}" ${S.order.includes(i)||S.checked?"disabled":""}>${w}</button>`
+    ).join("") + `</div>`;
+  }
+
+  // feedback
+  let fb="";
+  if(S.checked){
+    let ans="";
+    if(Q.type==="ox") ans=`정답: <b>${Q.a}</b>`;
+    if(Q.type==="mc") ans=`정답: <b>${LETTERS[Q.a]}) <span class="${Q.en?'en':''}">${Q.choices[Q.a].replace(/____/g,"___")}</span></b>`;
+    if(Q.type==="err") ans=`틀린 곳: <b class="en">${Q.tokens[Q.a]}</b> → <b class="en">${Q.fix}</b>`;
+    if(Q.type==="order") ans=`정답: <b class="en">${Q.a.join(" ")}.</b>`;
+    if(Q.type==="pick") ans=Q.layout==="list" ? `정답: <b>${Q.a.map(i=>"①②③④⑤⑥⑦⑧"[i]).join(", ")}</b> <span class="hint">(위에서 초록색 표시)</span>` : `정답: <b class="en">${Q.a.map(i=>Q.items[i]).join(", ")}</b>`;
+    fb=`<div class="feedback show ${S.correct?'ok':'bad'}">
+      <div class="verdict">${S.correct?"정답이에요!":"아쉬워요!"}</div>
+      <div class="ans">${ans}</div><div class="exp">${Q.exp}</div></div>`;
+  }
+
+  const ready = Q.type==="order" ? S.order.length===Q.a.length : Q.type==="pick" ? S.picks.length>0 : S.sel!==null;
+  body += fb + `<div class="actions">
+      <button class="btn ghost" id="prev" ${idx===0?"disabled":""}>← 이전</button>
+      <span>
+        ${S.checked
+          ? `<button class="btn" id="next">${idx===QUESTIONS.length-1?"결과 보기":"다음 →"}</button>`
+          : `<button class="btn" id="check" ${ready?"":"disabled"}>정답 확인</button>`}
+      </span></div>`;
+  $("#card").innerHTML = body;
+
+  // events
+  $("#card").querySelectorAll(".choice,.tok").forEach(b=>b.onclick=()=>{
+    S.sel = Q.type==="ox" ? b.dataset.v : Number(b.dataset.v); render();
+  });
+  $("#card").querySelectorAll(".pk").forEach(b=>b.onclick=()=>{
+    const i=Number(b.dataset.p); S.picks = S.picks.includes(i) ? S.picks.filter(x=>x!==i) : [...S.picks,i]; render();
+  });
+  $("#card").querySelectorAll(".chip[data-b]").forEach(b=>b.onclick=()=>{S.order.push(Number(b.dataset.b));render();});
+  $("#card").querySelectorAll(".chip[data-k]").forEach(b=>b.onclick=()=>{S.order.splice(Number(b.dataset.k),1);render();});
+  const chk=$("#check"); if(chk) chk.onclick=check;
+  const nx=$("#next"); if(nx) nx.onclick=()=>{ idx++; if(idx>=QUESTIONS.length && !endTime) endTime=Date.now(); render(); };
+  const pv=$("#prev"); if(pv) pv.onclick=()=>{idx--;render();};
+}
+
+function check(){
+  const Q=QUESTIONS[idx], S=state[idx];
+  if(Q.type==="order") S.correct = S.order.map(i=>Q.bank[i]).join(" ")===Q.a.join(" ");
+  else if(Q.type==="pick") S.correct = [...S.picks].sort().join()===[...Q.a].sort().join();
+  else S.correct = S.sel===Q.a;
+  S.checked=true; render();
+}
+
+function renderStart(){
+  $("#roundName").textContent=""; $("#counter").textContent="";
+  $("#card").innerHTML=`<div class="start">
+    <span class="round">개인전</span>
+    <div class="q" style="margin-top:14px">이름(또는 번호)을 입력하고 시작하세요.</div>
+    <form id="sf"><input id="nm" class="nm" maxlength="20" placeholder="예) 2학년 3반 15번 김민지" autocomplete="off">
+    <button class="btn" id="go" type="submit">시작하기 →</button></form>
+    <ul class="rules">
+      <li>문제는 모두 <b>${QUESTIONS.length}개</b>예요.</li>
+      <li>한 문제에 <b>한 번만</b> 답할 수 있어요. ‘정답 확인’을 누르면 답을 바꿀 수 없어요.</li>
+      <li>끝까지 풀면 내 점수와 걸린 시간이 나와요. 결과 화면을 선생님께 보여 주세요.</li>
+    </ul></div>`;
+  const nm=$("#nm"), go=$("#go");
+  const upd=()=>{ go.disabled=!nm.value.trim(); };
+  nm.oninput=upd; upd(); try{ nm.focus(); }catch(e){}
+  $("#sf").onsubmit=e=>{ e.preventDefault(); const v=nm.value.trim(); if(!v) return;
+    player=v; attempt++; state=QUESTIONS.map(blank); idx=0; startTime=Date.now(); endTime=null; render(); };
+}
+
+function fmt(ms){ const t=Math.round(ms/1000); return `${Math.floor(t/60)}분 ${String(t%60).padStart(2,"0")}초`; }
+
+function renderEnd(){
+  $("#roundName").textContent="결과";
+  $("#counter").textContent="";
+  const ok=state.filter(s=>s.correct).length, n=QUESTIONS.length, done=state.filter(s=>s.checked).length;
+  const score=Math.round(ok/n*100);
+  const msg = score>=90?"완벽해요! 지각동사 마스터 🏆": score>=70?"잘했어요! 틀린 문제만 다시 확인해 봐요 👍": score>=50?"절반 넘게 맞혔어요. 정리 내용을 한 번 더 봐요 💪":"괜찮아요! 핵심 정리를 읽고 다시 도전해 봐요 📚";
+  const wrong=QUESTIONS.map((q,i)=>i).filter(i=>!state[i].correct);
+  const rows=Object.entries(ROUNDS).map(([r,name])=>{
+    const qs=QUESTIONS.map((q,i)=>[q,i]).filter(([q])=>q.r==r);
+    if(!qs.length) return "";
+    const c=qs.filter(([,i])=>state[i].correct).length;
+    return `<tr><td>${name.split(" · ")[1]}</td><td>${c} / ${qs.length}</td></tr>`;
+  }).join("");
+  $("#card").innerHTML=`<div class="end">
+    <div class="certificate">
+      <div class="who">${esc(player)}</div>
+      <div class="big">${score}<small>점</small></div>
+      <div class="sub2">${n}문제 중 <b>${ok}개</b> 정답 · 걸린 시간 <b>${startTime&&endTime?fmt(endTime-startTime):"-"}</b>${attempt>1?` · <b>${attempt}번째 도전</b>`:""}</div>
+      ${done<n?`<div class="hint">아직 풀지 않은 문제 ${n-done}개</div>`:""}
+      <div class="msg">${msg}</div>
+    </div>
+    <table><tr><th>영역</th><th>정답</th></tr>${rows}</table>
+    ${wrong.length?`<div class="wrong"><b>틀린 문제 다시 보기</b><div class="wlist">${wrong.map(i=>`<button class="wq" data-i="${i}">Q${i+1}</button>`).join("")}</div></div>`:""}
+    <div class="summary">
+      <b>핵심 정리</b><br>
+      ① 지각동사 뒤에 <b>목적어 + 목적격 보어</b>가 오면 5형식 (I saw a movie.는 3형식!)<br>
+      ② 목적격 보어 = <b>동사원형</b>(완결된 사건) 또는 <b>동사ing</b>(진행 중·반복) — to부정사 ✗, -s / -ed ✗<br>
+      ③ smell은 주로 <b>동사ing</b> · 목적어 자리는 <b>목적격</b>(him, her, them)<br>
+      ④ 수동태에서는 to부정사가 살아나요: He was seen <b>to enter</b>.
+    </div>
+    <div class="actions" style="justify-content:center">
+      <button class="btn" id="reset">처음부터 다시 도전</button>
+    </div></div>`;
+  $("#card").querySelectorAll(".wq").forEach(b=>b.onclick=()=>{idx=Number(b.dataset.i);render();});
+  $("#reset").onclick=()=>{ attempt++; state=QUESTIONS.map(blank); idx=0; startTime=Date.now(); endTime=null; render(); };
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.target && e.target.tagName==="INPUT") return;
+  if(e.key==="ArrowRight" && player && idx<QUESTIONS.length && state[idx].checked){ idx++; if(idx>=QUESTIONS.length && !endTime) endTime=Date.now(); render(); }
+  if(e.key==="ArrowLeft" && player && idx>0){idx--;render();}
+});
+
+render();
+</script>
+</body>
+</html>
